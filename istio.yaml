@@ -34,6 +34,11 @@ spec:
           exact: muffin-wallet.ru
       uri:
         prefix: /
+    timeout: 2s
+    retries:
+      attempts: 3
+      perTryTimeout: 700ms
+      retryOn: gateway-error,connect-failure,refused-stream,reset,5xx
     route:
     - destination:
         host: muffin-wallet
@@ -45,8 +50,36 @@ spec:
           exact: muffin-wallet-log.ru
       uri:
         prefix: /
+    timeout: 2s
+    retries:
+      attempts: 3
+      perTryTimeout: 700ms
+      retryOn: gateway-error,connect-failure,refused-stream,reset,5xx
     route:
     - destination:
         host: muffin-wallet-log
         port:
           number: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: currency-circuit-breaker-wallet
+  namespace: default
+spec:
+  host: muffin-wallet
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 50
+        connectTimeout: 1s
+      http:
+        http1MaxPendingRequests: 20
+        maxRequestsPerConnection: 100
+        maxRetries: 3
+        http2MaxRequests: 100
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 5s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 100

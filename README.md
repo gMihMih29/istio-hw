@@ -49,6 +49,9 @@ istio_request_duration_milliseconds_bucket
 ### Resilience:
 1. Настроить Circuit Breaker и Retry для устойчивости к сбоям.
 2. Реализовать таймауты и лимиты на количество запросов.
+```
+istioctl proxy-config clusters muffin-wallet-65ddc65986-5scbt | grep muffin-wallet 
+```
 
 ### VirtualService, ServiceEntry, Gateway :
 1. Создать VirtualService для маршрутизации трафика между muffin-wallet и muffin-currency.
