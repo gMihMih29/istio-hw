@@ -17,7 +17,16 @@ kubectl label namespace default istio-injection=enabled
 ## Конфигурация Istio
 ### Ingress Gateway:
 1. Настритоь Istio Ingress Gateway для внешнего доступа к muffin-wallet.
+```
+istioctl install --set profile=demo -y
+```
+см `istio.yaml`
 2. Обеспечить маршрутизацию трафика по хосту (например, wallet.example.com).
+для LoadBalancer
+```
+kubectl -n istio-system get svc istio-ingressgateway
+minikube tunnel
+```
 
 ### Observability:
 1. Установить Kiali, Prometheus для визуализации трафика и метрик.

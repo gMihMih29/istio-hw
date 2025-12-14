@@ -1,0 +1,52 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: muffin-gateway
+  namespace: default
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - muffin-wallet.ru
+    - muffin-wallet-log.ru
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: muffin-vs
+  namespace: default
+spec:
+  hosts:
+  - muffin-wallet.ru
+  - muffin-wallet-log.ru
+  gateways:
+  - muffin-gateway
+  http:
+  - match:
+    - headers:
+        host:
+          exact: muffin-wallet.ru
+      uri:
+        prefix: /
+    route:
+    - destination:
+        host: muffin-wallet
+        port:
+          number: 80
+  - match:
+    - headers:
+        host:
+          exact: muffin-wallet-log.ru
+      uri:
+        prefix: /
+    route:
+    - destination:
+        host: muffin-wallet-log
+        port:
+          number: 80
