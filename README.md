@@ -31,6 +31,16 @@ minikube tunnel
 ### Observability:
 1. Установить Kiali, Prometheus для визуализации трафика и метрик.
 2. Настроить сбор метрик и трассировку запросов между микросервисами.
+```
+istioctl dashboard kiali
+istioctl dashboard prometheus
+istioctl dashboard jaeger
+```
+```
+istio_requests_total
+rate(istio_requests_total[1m])
+istio_request_duration_milliseconds_bucket
+```
 
 ### Security:
 1. Включить mTLS для шифрования трафика между микросервисами.
