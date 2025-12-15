@@ -83,3 +83,26 @@ spec:
       interval: 5s
       baseEjectionTime: 30s
       maxEjectionPercent: 100
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: dr-wallet-istio-mutual
+  namespace: default
+spec:
+  host: muffin-wallet.default.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: dr-wallet-log-istio-mutual
+  namespace: default
+spec:
+  host: muffin-wallet-log.default.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+
