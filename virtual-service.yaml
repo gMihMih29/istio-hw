@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: muffin-currency-vs
+  namespace: default
+spec:
+  hosts:
+  - muffin-currency
+  http:
+  - match:
+    - uri:
+        prefix: /rate
+    route:
+    - destination:
+        host: muffin-currency
+        port:
+          number: 8083
