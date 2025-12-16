@@ -1,9 +1,0 @@
----
-apiVersion: telemetry.istio.io/v1
-kind: Telemetry
-metadata:
-  name: tracing-default
-  namespace: istio-system
-spec:
-  tracing:
-  - randomSamplingPercentage: 100.0

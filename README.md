@@ -2,6 +2,13 @@
 
 muffin-wallet и muffin-currency должны разворачиваться через helmfile
 
+```
+helm create muffin
+
+helmfile apply
+
+```
+
 ## Установка Istio
 1. Установить Istio в кластер.
 ```
