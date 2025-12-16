@@ -34,6 +34,14 @@ wallet:
   autoscaling:
     enabled: false
 
+  logs:
+    image:
+      repository: nginx
+      tag: 1.29.3
+
+    Port: 80
+    OutsidePort: 80
+
 currency:
   replicaCount: 1
 

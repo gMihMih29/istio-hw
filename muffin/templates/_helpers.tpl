@@ -144,3 +144,18 @@ readinessProbe:
   initialDelaySeconds: {{ .Values.currency.Container.ReadinessProbe.InitialDelaySeconds }}
   periodSeconds: {{ .Values.currency.Container.ReadinessProbe.PeriodSeconds }}
 {{- end }}
+
+{{- define "homework.wallet.logs.config" -}}
+events {
+}
+
+http {
+    server {
+        listen {{ .Values.wallet.logs.Port }};
+        location /logs {
+            alias /usr/share/nginx/html;
+            autoindex on;
+        }
+    }
+}
+{{- end }}

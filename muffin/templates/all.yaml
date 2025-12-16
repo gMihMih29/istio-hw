@@ -54,15 +54,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: muffin-wallet-log
+  name: {{ include "homework.wallet.fullname" . }}-log
 spec:
   type: ClusterIP
   selector:
-    app: muffin-wallet
+    app: {{ include "homework.wallet.fullname" . }}
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: {{ .Values.wallet.logs.OutsidePort }}
+      targetPort: {{ .Values.wallet.logs.Port }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -91,7 +91,7 @@ spec:
           emptyDir: {}
       containers:
         - name: nginx-log
-          image: nginx:1.29.3
+          image: "{{ .Values.wallet.logs.image.repository }}:{{ .Values.wallet.logs.image.tag }}"
           volumeMounts:
             - name: nginx-config-volume
               mountPath: /etc/nginx
@@ -143,15 +143,4 @@ metadata:
   name: nginx-config
 data:
   nginx.conf: |
-    events {
-    }
-
-    http {
-        server {
-            listen 80;
-            location /logs {
-                alias /usr/share/nginx/html;
-                autoindex on;
-            }
-        }
-    }
+    {{ include "homework.wallet.logs.config" . | nindent 4 }}
