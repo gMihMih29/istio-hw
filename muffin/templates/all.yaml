@@ -1,0 +1,146 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "homework.currency.fullname" . }}
+  labels:
+    {{- include "homework.currency.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.currency.autoscaling.enabled }}
+  replicas: {{ .Values.currency.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "homework.currency.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "homework.currency.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ include "homework.currency.fullname" . }}
+        image: "{{ .Values.currency.image.repository }}:{{ .Values.currency.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.currency.Container.Port }}
+        {{- include "homework.currency.livenessProbe" . | nindent 8 }}
+        {{- include "homework.currency.readinessProbe" . | nindent 8 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "homework.currency.fullname" . }}
+spec:
+  selector:
+    {{- include "homework.currency.selectorLabels" . | nindent 4 }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.currency.OutsidePort }}
+      targetPort: {{ .Values.currency.Container.Port }}
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "homework.wallet.fullname" . }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ include "homework.wallet.fullname" . }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.wallet.OutsidePort }}
+      targetPort: {{ .Values.wallet.Container.Port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "homework.wallet.fullname" . }}-log
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ include "homework.wallet.fullname" . }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.wallet.logs.OutsidePort }}
+      targetPort: {{ .Values.wallet.logs.Port }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "homework.wallet.fullname" . }}
+  labels:
+    app: {{ include "homework.wallet.fullname" . }}
+spec:
+  replicas: {{ .Values.wallet.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "homework.wallet.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "homework.wallet.fullname" . }}
+    spec:
+      volumes:
+        - name: application-config-volume
+          configMap:
+            name: muffin-wallet
+        - name: nginx-config-volume
+          configMap:
+            name: nginx-config
+        - name: log-volume
+          emptyDir: {}
+      containers:
+        - name: nginx-log
+          image: "{{ .Values.wallet.logs.image.repository }}:{{ .Values.wallet.logs.image.tag }}"
+          volumeMounts:
+            - name: nginx-config-volume
+              mountPath: /etc/nginx
+            - name: log-volume
+              mountPath: /usr/share/nginx/html
+        - name: {{ include "homework.wallet.fullname" . }}
+          image: "{{ .Values.wallet.image.repository }}:{{ .Values.wallet.image.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.wallet.Container.Port }}
+          volumeMounts:
+            - name: application-config-volume
+              mountPath: /app/config
+            - name: log-volume
+              mountPath: /logs
+          envFrom:
+            - secretRef:
+                name: {{ include "homework.wallet.fullname" . }}
+            - configMapRef:
+                name: {{ include "homework.wallet.fullname" . }}-env
+          {{- include "homework.wallet.livenessProbe" . | nindent 10 }}
+          {{- include "homework.wallet.readinessProbe" . | nindent 10 }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "homework.wallet.fullname" . }}
+data:
+  SPRING_DATASOURCE_PASSWORD: {{ .Values.postgres.password }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "homework.wallet.fullname" . }}-env
+data:
+  JDK_JAVA_OPTIONS: -Dspring.config.additional-location=/app/config/application.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: muffin-wallet
+data:
+  application.yaml: |-
+    {{ include "homework.wallet.config" . | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |
+    {{ include "homework.wallet.logs.config" . | nindent 4 }}

@@ -1,0 +1,7 @@
+releases:
+  - name: muffin
+    namespace: default
+    createNamespace: true
+    chart: ./muffin
+    values:
+      - ./values/values.yaml
