@@ -1,0 +1,61 @@
+postgres:
+  host: host.minikube.internal
+
+  db: muffin_wallet
+  user: muffin-wallet
+  password: bXVmZmluLXdhbGxldA==
+
+  port: 5432
+  outsidePort: 5432
+
+wallet:
+  replicaCount: 1
+
+  image:
+    repository: aadan1lov/muffin-wallet
+    tag: 1.1.0
+  
+  nameOverride: "muffin-wallet"
+  fullnameOverride: "muffin-wallet"
+
+  OutsidePort: 80
+
+  Container:
+    Port: 8081
+    LivenessProbe:
+      Path: /actuator/health/liveness
+      InitialDelaySeconds: 30
+      PeriodSeconds: 5
+    ReadinessProbe:
+      Path: /actuator/health/readiness
+      InitialDelaySeconds: 5
+      PeriodSeconds: 10
+  
+  autoscaling:
+    enabled: false
+
+currency:
+  replicaCount: 1
+
+  image:
+    repository: aadan1lov/muffin-currency
+    tag: 1.0.0
+
+  nameOverride: "muffin-currency"
+  fullnameOverride: "muffin-currency"
+
+  OutsidePort: 8080
+
+  Container:
+    Port: 8080
+    LivenessProbe:
+      Path: /rate?from=PLAIN&to=CHOKOLATE
+      InitialDelaySeconds: 5
+      PeriodSeconds: 10
+    ReadinessProbe:
+      Path: /rate?from=PLAIN&to=CHOKOLATE
+      InitialDelaySeconds: 2
+      PeriodSeconds: 5
+
+  autoscaling:
+    enabled: false
