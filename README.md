@@ -4,9 +4,7 @@ muffin-wallet и muffin-currency должны разворачиваться ч�
 
 ```
 helm create muffin
-
 helmfile apply
-
 ```
 
 ## Установка Istio

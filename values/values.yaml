@@ -17,6 +17,7 @@ wallet:
   
   nameOverride: "muffin-wallet"
   fullnameOverride: "muffin-wallet"
+  host: "muffin-wallet.ru"
 
   OutsidePort: 80
 
@@ -35,6 +36,8 @@ wallet:
     enabled: false
 
   logs:
+    host: "muffin-wallet-log.ru"
+
     image:
       repository: nginx
       tag: 1.29.3

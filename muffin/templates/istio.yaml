@@ -13,8 +13,8 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - muffin-wallet.ru
-    - muffin-wallet-log.ru
+    - {{ .Values.wallet.host }}
+    - {{ .Values.wallet.logs.host }}
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -23,15 +23,15 @@ metadata:
   namespace: default
 spec:
   hosts:
-  - muffin-wallet.ru
-  - muffin-wallet-log.ru
+  - {{ .Values.wallet.host }}
+  - {{ .Values.wallet.logs.host }}
   gateways:
   - muffin-gateway
   http:
   - match:
     - headers:
         host:
-          exact: muffin-wallet.ru
+          exact: {{ .Values.wallet.host }}
       uri:
         prefix: /
     timeout: 2s
@@ -47,7 +47,7 @@ spec:
   - match:
     - headers:
         host:
-          exact: muffin-wallet-log.ru
+          exact: {{ .Values.wallet.logs.host }}
       uri:
         prefix: /
     timeout: 2s

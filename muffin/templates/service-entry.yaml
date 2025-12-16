@@ -6,10 +6,10 @@ metadata:
   namespace: default
 spec:
   hosts:
-  - host.minikube.internal
+  - {{ .Values.postgres.host }}
   location: MESH_EXTERNAL
   ports:
-  - number: 5432
+  - number: {{ .Values.postgres.OutsidePort }}
     name: tcp-postgres
     protocol: TCP
   resolution: DNS
